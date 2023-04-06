@@ -98,6 +98,7 @@ public class Patient {
 
         Patient donaldPutin = new Patient("110201321", "Donald Putin", 90, 39, false, true);
 
+        allPatients.add(donaldPutin);
         allPatients.add(new Patient("030201321", "Lucky Luke", 69, 38, true, false));
         allPatients.add(new Patient("030201322", "Stromae Papaoutai", 35, 40, false, true));
         allPatients.add(new Patient("030801321", "GringoireLune", 80, 36, true, true));
