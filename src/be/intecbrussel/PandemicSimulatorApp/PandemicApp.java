@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 public class PandemicApp {
     public static void main(String[] args) {
 
+
         //Opdracht 1( /1 ):
         // De hoofdverpleegster wilt dat je alle patienten in een lijst stopt
         // die ervoor zorgt dat elkePatient er maar 1 keer in voorkomt,
@@ -15,7 +16,7 @@ public class PandemicApp {
         // en alles involgorde houdt. Print de lijst af.
         System.out.println("*** Opdracht 1( /1 ) *** \n");
 
-        List <Patient> patients = Patient.getAllPatients();
+        List<Patient> patients = Patient.getAllPatients();
 
         Collection<Patient> setPatients = new LinkedHashSet<>(patients);
         setPatients.forEach(System.out::println);
@@ -48,12 +49,12 @@ public class PandemicApp {
 
         System.out.println("-----------------------------------------------------------------------------------------");
 
-        Collection <Patient> patientPriorityQueue = setPatients.stream()
-                                .sorted(Comparator.comparing(Patient::isEnsured)
-                                .thenComparing(Patient::getTemperature)
-                                .thenComparing(Patient::getAge)
-                                .reversed())
-                                .collect(Collectors.toCollection(LinkedBlockingQueue::new));
+        Collection<Patient> patientPriorityQueue = setPatients.stream()
+                .sorted(Comparator.comparing(Patient::isEnsured)
+                        .thenComparing(Patient::getTemperature)
+                        .thenComparing(Patient::getAge)
+                        .reversed())
+                .collect(Collectors.toCollection(LinkedBlockingQueue::new));
 
         for (Patient patient : patientPriorityQueue) {
             System.out.println(patient);
@@ -86,14 +87,70 @@ public class PandemicApp {
 
         System.out.println("\n*** Opdracht 3( /4 ) *** \n");
 
+        Queue<Patient> patientQueue = (Queue<Patient>) patientPriorityQueue;
+
+        Map<Integer, List<Patient>> patientsListMap = new TreeMap <> ();
+        Patient patienten;
+
+        while (!patientQueue.isEmpty()) {
+
+            patienten = patientQueue.poll();
+
+            boolean hasHightFever = patienten.getTemperature() >= 40;
+            boolean isSenior = patienten.getAge() >= 65;
+            boolean hasNormalFever = patienten.getTemperature() >= 38;
+            boolean hasUnknownVirus = patienten.isUnknownVirus();
+
+            int category = 0;
+
+            if ((hasHightFever || (isSenior && hasHightFever)) && hasUnknownVirus) {
+
+                category = 1;
+
+            } else if (hasNormalFever && hasUnknownVirus) {
+
+                category = 2;
+
+            } else if (hasUnknownVirus) {
+
+                category = 3;
+
+            } else if (hasNormalFever) {
+
+                category = 4;
+
+            }
+
+            if (category == 0) {
+                continue;
+
+            }
+
+            patientsListMap.putIfAbsent(category, new ArrayList<>());
+            patientsListMap.get(category).add(patienten);
+
+            for (Map.Entry<Integer, List<Patient>> entry : patientsListMap.entrySet()) {
+                System.out.println("-".repeat(100));
+                System.out.println("Category " + entry.getKey());
+                System.out.println("-".repeat(100));
+
+                for (Patient patient : entry.getValue()) {
+                    System.out.println(patient);
+                }
+
+
+            }
+
+        }
+
         //category1
         System.out.println("\n*** category1 *** \n");
 
         Collection<Patient> category1 = setPatients
-                        .stream()
-                        .filter(patient -> patient.getAge() <= 65 && patient.getTemperature() >= 38
-                                || patient.getTemperature() >= 40 && patient.isUnknownVirus())
-                        .collect(Collectors.toCollection(LinkedBlockingQueue::new));
+                .stream()
+                .filter(patient -> patient.getAge() <= 65 && patient.getTemperature() >= 38
+                        || patient.getTemperature() >= 40 && patient.isUnknownVirus())
+                .collect(Collectors.toCollection(LinkedBlockingQueue::new));
 
         category1.forEach(System.out::println);
 
@@ -101,9 +158,9 @@ public class PandemicApp {
         System.out.println("\n*** category2 *** \n");
 
         Collection<Patient> category2 = setPatients
-                        .stream()
-                        .filter(patient -> (patient.getTemperature() <= 38 || patient.getTemperature() >= 38) && patient.isUnknownVirus())
-                        .collect(Collectors.toCollection(LinkedBlockingQueue::new));
+                .stream()
+                .filter(patient -> (patient.getTemperature() <= 38 || patient.getTemperature() >= 38) && patient.isUnknownVirus())
+                .collect(Collectors.toCollection(LinkedBlockingQueue::new));
 
         category2.forEach(System.out::println);
 
@@ -111,9 +168,9 @@ public class PandemicApp {
         System.out.println("\n*** category3 *** \n");
 
         Collection<Patient> category3 = setPatients
-                        .stream()
-                        .filter(patient -> patient.getTemperature() <= 36 && patient.isUnknownVirus())
-                        .collect(Collectors.toCollection(LinkedBlockingQueue::new));
+                .stream()
+                .filter(patient -> patient.getTemperature() <= 38 && patient.isUnknownVirus())
+                .collect(Collectors.toCollection(LinkedBlockingQueue::new));
 
         category3.forEach(System.out::println);
 
@@ -122,42 +179,42 @@ public class PandemicApp {
         System.out.println("\n*** category4 *** \n");
 
         Collection<Patient> category4 = setPatients
-                        .stream()
-                        .filter(patient -> patient.getTemperature() >= 38 && !patient.isUnknownVirus())
-                        .collect(Collectors.toCollection(LinkedBlockingQueue::new));
+                .stream()
+                .filter(patient -> patient.getTemperature() >= 38 && !patient.isUnknownVirus())
+                .collect(Collectors.toCollection(LinkedBlockingQueue::new));
 
         category4.forEach(System.out::println);
 
         System.out.println("---------------------------------------------------------------");
 
-        Map <Integer, Collection<Patient>> mapCollection = new HashMap<>();
+        Map<Integer, Collection<Patient>> mapCollection = new HashMap<>();
 
         int key = 1;
-        for (Patient p:category1) {
+        for (Patient p : category1) {
             mapCollection.putIfAbsent(key, category1);
         }
 
         int key2 = 2;
-        for (Patient p:category2) {
+        for (Patient p : category2) {
             mapCollection.putIfAbsent(key2, category2);
         }
 
         int key3 = 3;
-        for (Patient p:category3) {
+        for (Patient p : category3) {
             mapCollection.putIfAbsent(key3, category3);
         }
 
         int key4 = 4;
-        for (Patient p:category4) {
+        for (Patient p : category4) {
             mapCollection.putIfAbsent(key4, category4);
         }
 
-        for(Map.Entry<Integer, Collection<Patient>> category : mapCollection.entrySet()){
+        for (Map.Entry<Integer, Collection<Patient>> category : mapCollection.entrySet()) {
             System.out.printf("KEY: %s | VALUE: %s %n", category.getKey(), category.getValue());
         }
 
-        }
-
     }
+
+}
 
 
